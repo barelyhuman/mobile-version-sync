@@ -1,7 +1,12 @@
 package handlers
 
 type AndroidVersionHandler struct {
-	directory string
+	Directory string
+	AppName   string
+}
+
+func (handler AndroidVersionHandler) Setup() error {
+	return nil
 }
 
 func (handler AndroidVersionHandler) GetCurrentVersion(projectDir string) string {

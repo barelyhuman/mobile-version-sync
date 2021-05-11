@@ -12,6 +12,7 @@ type Options struct {
 	directory     *string
 	version       *string
 	bumpBuildCode *bool
+	appName       *string
 }
 
 var options Options
@@ -28,6 +29,7 @@ func Setup() bool {
 	options.directory = flag.String("dir", "./ios/", "directory that contains the android or iOS structure")
 	options.version = flag.String("version", "", "version string to sync with")
 	options.bumpBuildCode = flag.Bool("bump", false, "bump the build/versionCode as well (default: false)")
+	options.appName = flag.String("app", "", "app name")
 
 	for from, to := range flatAliases {
 		flagSet := flag.Lookup(from)
@@ -46,12 +48,18 @@ func Run() error {
 	switch selectedPlatfrom {
 	case "android":
 		{
-			versionHandler = handlers.AndroidVersionHandler{}
+			versionHandler = handlers.AndroidVersionHandler{
+				AppName:   *options.appName,
+				Directory: *options.directory,
+			}
 			break
 		}
 	case "ios":
 		{
-			versionHandler = handlers.IOSVersionHandler{}
+			versionHandler = handlers.IOSVersionHandler{
+				AppName:   *options.appName,
+				Directory: *options.directory,
+			}
 			break
 		}
 	default:
@@ -61,15 +69,17 @@ func Run() error {
 		}
 	}
 
+	versionHandler.Setup()
+
 	IncreaseVersion(versionHandler)
 
 	if !*options.bumpBuildCode {
 		return nil
 	}
 
-	BumpBuild(versionHandler)
+	err := BumpBuild(versionHandler)
 
-	return nil
+	return err
 }
 
 func IncreaseVersion(versionHandler handlers.VersionHandler) error {
@@ -81,5 +91,6 @@ func IncreaseVersion(versionHandler handlers.VersionHandler) error {
 }
 
 func BumpBuild(versionHandler handlers.VersionHandler) error {
-	return versionHandler.IncrementCurrentBuild(versionHandler.GetCurrentBuild(*options.directory) + 1)
+	buildVersion := versionHandler.GetCurrentBuild(*options.directory)
+	return versionHandler.IncrementCurrentBuild(buildVersion)
 }
