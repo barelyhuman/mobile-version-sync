@@ -38,7 +38,7 @@ func (handler IOSVersionHandler) Setup() error {
 	return nil
 }
 
-func (handler IOSVersionHandler) GetCurrentVersion(projectDir string) string {
+func (handler IOSVersionHandler) GetCurrentVersion() string {
 	return fmt.Sprintf("%v", plistDetails.Props["CFBundleShortVersionString"])
 }
 
@@ -62,7 +62,7 @@ func (handler IOSVersionHandler) SetCurrentVersion(versionString string) error {
 	return nil
 }
 
-func (handler IOSVersionHandler) GetCurrentBuild(projectDir string) string {
+func (handler IOSVersionHandler) GetCurrentBuild() string {
 	return fmt.Sprintf("%v", plistDetails.Props["CFBundleVersion"])
 }
 

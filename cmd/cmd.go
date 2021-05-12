@@ -3,6 +3,7 @@ package cmd
 import (
 	"flag"
 	"fmt"
+	"log"
 
 	"github.com/barelyhuman/mobile-version-sync/handlers"
 )
@@ -83,14 +84,25 @@ func Run() error {
 }
 
 func IncreaseVersion(versionHandler handlers.VersionHandler) error {
-	currentVersion := versionHandler.GetCurrentVersion(*options.directory)
+	currentVersion := versionHandler.GetCurrentVersion()
 	if currentVersion == *options.version {
 		return fmt.Errorf("version already in sync? Did you want to bump the version code/ build number instead?")
 	}
-	return versionHandler.SetCurrentVersion(*options.version)
+	err := versionHandler.SetCurrentVersion(*options.version)
+	if err != nil {
+		return err
+	}
+	log.Println("Version Code | Build Number -  Set to:" + *options.version)
+
+	return nil
 }
 
 func BumpBuild(versionHandler handlers.VersionHandler) error {
-	buildVersion := versionHandler.GetCurrentBuild(*options.directory)
-	return versionHandler.IncrementCurrentBuild(buildVersion)
+	buildVersion := versionHandler.GetCurrentBuild()
+	err := versionHandler.IncrementCurrentBuild(buildVersion)
+	if err != nil {
+		return err
+	}
+	log.Println("Version Code | Build Number -  Bumped ")
+	return nil
 }
